@@ -1,5 +1,7 @@
 # Compare same 2 Django model instances
 
+from django.db import models
+
 
 def compare(a, b):
     ret = {}
@@ -11,7 +13,16 @@ def compare(a, b):
         except AttributeError:
             continue
 
-        if not callable(ax) and ax != bx:
+        equal = True
+
+        if not callable(ax):
+            if isinstance(ax, models.Model):
+                if ax.pk != bx.pk:
+                    equal = False
+            elif ax != bx:
+                equal = False
+
+        if not equal:
             ret[x] = (ax, bx)
 
     return ret
